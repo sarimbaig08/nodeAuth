@@ -43,3 +43,42 @@ export const signupController = async (req, res) => {
     });
   }
 };
+
+export const loginController = async (req, res) => {
+  console.log(req.body);
+  try {
+    const { email, password } = req.body;
+    if (!email || !password) {
+      res.json({
+        message: "error required fields are missing",
+        data: [],
+        status: false,
+      });
+      return;
+    }
+
+    const user = await userModel.findOne({ email });
+    if (!user) {
+      return res.json({
+        message: "Email or password is incorrect",
+        data: [],
+        status: false,
+      });
+    }
+
+    const hashPass = await bcrypt.compare(password, user.password);
+
+    res.json({
+      message: "User Logged in successfully",
+      data: user,
+      status: true,
+    });
+  } catch (error) {
+    res.json({
+      message: "error while logging in",
+      data: [],
+      error: error.message,
+      status: false,
+    });
+  }
+};
